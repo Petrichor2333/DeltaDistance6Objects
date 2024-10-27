@@ -72,33 +72,65 @@ int main() {
 	pobjA[0] = &objA0, pobjA[1] = &objA1, pobjA[2] = &objA2, pobjA[3] = &objA3, pobjA[4] = &objA4, pobjA[5] = &objA5, pobjA[6] = &objA6;
 	pobjB[0] = &objB0, pobjB[1] = &objB1, pobjB[2] = &objB2, pobjB[3] = &objB3,	pobjB[4] = &objB4, pobjB[5] = &objB5, pobjB[6] = &objB6;
 
-	for (int obj_i = 0;obj_i < 7;obj_i++) {
-		for (int obj_j = obj_i;obj_j < 7;obj_j++) {
+	cout << "Collision detection using delta-distance." << endl << endl;
 
-			if (obj_i == 0 && obj_j != 0) {
-				continue;
-			}
+	cout << "The example objects are:" << endl;
+
+	cout << "Object 1 is a mouse." << endl;
+	cout << "Object 2 is a pencil." << endl;
+	cout << "Object 3 is a diamond." << endl;
+	cout << "Object 4 is a piece of cake." << endl;
+	cout << "Object 5 is a pillow." << endl;
+	cout << "Object 6 is a rounded hexagonal nut." << endl;
+	cout << endl;
+
+	cout << "This code run the test of collision detection between two of the selected example objects." << endl;
+	cout << "Please input the number of the first selected object (between 1 to 6):";
+	int obj_i = 0;
+	while (1) {
+		cin >> obj_i;
+		if (obj_i >= 1 && obj_i <= 6) {
+			break;
+		}
+		else {
+			cout << "Please input a number between 1 to 6:";
+		}
+	}
+
+	cout << "Please input the number of the second selected object (between 1 to 6):";
+	int obj_j = 0;
+	while (1) {
+		cin >> obj_j;
+		if (obj_j >= 1 && obj_j <= 6) {
+			break;
+		}
+		else {
+			cout << "Please input a number between 1 to 6:";
+		}
+	}
+	cout << endl;
+
+	cout << "Collision detection can be tested in stationary cases or linearly translational moving cases." << endl;
+	cout << "Please select the type of cases (s or m, s for stationary cases, m for moving cases): ";
+	char TypeOfCases = 'S';
+	while (1) {
+		cin >> TypeOfCases;
+		if (TypeOfCases == 'S' || TypeOfCases == 's') {
+			
+			cout << endl;
+			cout << "Runing tests for objects " << obj_i << " and " << obj_j << " in stationary cases, 100,000 random samples in total:" << endl;
 
 			int num_of_failed = 0;
-			int num_of_failed_move = 0;
 
 			for (int i = 0;i < num_of_iter;i++) {
 
 				double R1[3][3], R2[3][3];
 				double p1[3], p2[3];
-				double R1m[3][3], R2m[3][3];
-				double p1m[3], p2m[3];
-				double v1[3], v2[3];
 
 				GenerateRandomRotTra(R1, p1, interval_boundary);
 				GenerateRandomRotTra(R2, p2, interval_boundary);
-				GenerateRandomRotTra(R1m, p1m, interval_boundary);
-				GenerateRandomRotTra(R2m, p2m, interval_boundary);
-				GenerateRandomVel(v1, Velocity_boundary);
-				GenerateRandomVel(v2, Velocity_boundary);
 
-				ResultsOfSolvingMinimum Result;				//Collision detection for stationary objects
-				ResultsOfSolvingMinimumMove ResultMove;		//Collision detection for moving objects
+				ResultsOfSolvingMinimum Result;				//Collision detection for stationary objects.
 
 				auto start = chrono::system_clock::now();
 				bool SolSucc = SolveForCollision(pobjA[obj_i], pobjB[obj_j], &Result, R1, p1, R2, p2);					//Collision detection for stationary objects
@@ -109,6 +141,63 @@ int main() {
 				TimeCosts[i] = time_cost;
 				//sum_time_cost = sum_time_cost + time_cost;
 
+
+				if (Result.if_success == 0) {
+					num_of_failed++;
+				}
+
+				if (i % 10000 == 0 && i > 0) {
+					cout << i << " samples have been tested." << endl;
+				}
+			}
+			cout << "All 100,000 samples have been tested." << endl << endl;
+
+			double SumNumIters = 0, SumTimeCosts = 0;
+			for (int i = 0;i < num_of_iter;i++) {
+				SumNumIters += (double)(NumIters[i]);
+				SumTimeCosts += TimeCosts[i];
+			}
+			double AveNumIters = SumNumIters / num_of_iter;
+			double AveTimeCosts = SumTimeCosts / num_of_iter;
+
+			double SDNumIters = 0, SDTimeCosts = 0;
+			for (int i = 0;i < num_of_iter;i++) {
+				SDNumIters += ((double)(NumIters[i]) - AveNumIters)*((double)(NumIters[i]) - AveNumIters);
+				SDTimeCosts += (TimeCosts[i] - AveTimeCosts)*(TimeCosts[i] - AveTimeCosts);
+			}
+			SDNumIters = sqrt(SDNumIters / num_of_iter);
+			SDTimeCosts = sqrt(SDTimeCosts / num_of_iter);
+
+			cout << "The results of testing:" << endl;
+			cout << "Number of iteration:  Average, standard deviation: " << endl;
+			cout << AveNumIters << " +/- " << SDNumIters << endl;
+			cout << "Time cost:  Average, standard deviation: " << endl;
+			cout << AveTimeCosts << " +/- " << SDTimeCosts << endl;
+			cout << "Number of failed: " << num_of_failed << endl;
+			cout << endl << endl;
+
+			break;
+		}
+		else if (TypeOfCases == 'M' || TypeOfCases == 'm') {
+			
+			cout << endl;
+			cout << "Runing tests for objects " << obj_i << " and " << obj_j << " in moving cases, 100,000 random samples in total:" << endl;
+
+			int num_of_failed_move = 0;
+
+			for (int i = 0;i < num_of_iter;i++) {
+
+				double R1m[3][3], R2m[3][3];
+				double p1m[3], p2m[3];
+				double v1[3], v2[3];
+
+				GenerateRandomRotTra(R1m, p1m, interval_boundary);
+				GenerateRandomRotTra(R2m, p2m, interval_boundary);
+				GenerateRandomVel(v1, Velocity_boundary);
+				GenerateRandomVel(v2, Velocity_boundary);
+
+				ResultsOfSolvingMinimumMove ResultMove;		//Collision detection for moving objects.
+
 				auto startMove = chrono::system_clock::now();
 				bool SolSuccMove = SolveForCollisionMove(pobjA[obj_i], pobjB[obj_j], &ResultMove, R1m, p1m, R2m, p2m, v1, v2);		//Collision detection for moving objects
 				auto endMove = chrono::system_clock::now();
@@ -118,89 +207,43 @@ int main() {
 				NumItersMove[i] = ResultMove.num_iter;
 				TimeCostsMove[i] = time_cost_move;
 
-				/*
-				for (int k = 0;k < NumIter.size();k++) {
-					if (Result.num_iter <= NumRange[k + 1]) {
-						NumIter[k]++;
-					}
-				}*/
-
-				if (Result.if_success == 0) {
-					num_of_failed++;
-				}
 				if (ResultMove.if_success == 0) {
 					num_of_failed_move++;
 				}
 
-				/*
 				if (i % 10000 == 0 && i > 0) {
-					cout << "iteration: " << i << endl;
+					cout << i << " samples have been tested." << endl;
 				}
-				*/
 			}
+			cout << "All 100,000 samples have been tested." << endl << endl;
 
-			double SumNumIters = 0, SumTimeCosts = 0;
 			double SumNumItersMove = 0, SumTimeCostsMove = 0;
 			for (int i = 0;i < num_of_iter;i++) {
-				SumNumIters += (double)(NumIters[i]);
-				SumTimeCosts += TimeCosts[i];
 				SumNumItersMove += (double)(NumItersMove[i]);
 				SumTimeCostsMove += TimeCostsMove[i];
 			}
-			double AveNumIters = SumNumIters / num_of_iter;
-			double AveTimeCosts = SumTimeCosts / num_of_iter;
 			double AveNumItersMove = SumNumItersMove / num_of_iter;
 			double AveTimeCostsMove = SumTimeCostsMove / num_of_iter;
 
-			double SDNumIters = 0, SDTimeCosts = 0;
 			double SDNumItersMove = 0, SDTimeCostsMove = 0;
 			for (int i = 0;i < num_of_iter;i++) {
-				SDNumIters += ((double)(NumIters[i]) - AveNumIters)*((double)(NumIters[i]) - AveNumIters);
-				SDTimeCosts += (TimeCosts[i] - AveTimeCosts)*(TimeCosts[i] - AveTimeCosts);
 				SDNumItersMove += ((double)(NumItersMove[i]) - AveNumItersMove)*((double)(NumItersMove[i]) - AveNumItersMove);
 				SDTimeCostsMove += (TimeCostsMove[i] - AveTimeCostsMove)*(TimeCostsMove[i] - AveTimeCostsMove);
 			}
-			SDNumIters = sqrt(SDNumIters / num_of_iter);
-			SDTimeCosts = sqrt(SDTimeCosts / num_of_iter);
 			SDNumItersMove = sqrt(SDNumItersMove / num_of_iter);
 			SDTimeCostsMove = sqrt(SDTimeCostsMove / num_of_iter);
 
-			cout << "Runing tests for objects " << obj_i << " and " << obj_j << " ..." << endl;
-			if (obj_i == 0) {
-				cout << "Object 0 is an ellipse with three semi axes of 1.5, 1.2, and 0.7, respectively." << endl;
-			}
-
-			cout << endl;
-			cout << "Stationary cases:" << endl;
-			cout << "Number of iteration:  Average, standard deviation: " << endl;
-			cout << AveNumIters << " +/- " << SDNumIters << endl;
-			cout << "Time cost:  Average, standard deviation: " << endl;
-			cout << AveTimeCosts << " +/- " << SDTimeCosts << endl;
-			cout << "Number of failed: " << num_of_failed << endl;
-			cout << endl << endl;
-
-			cout << "Moving cases:" << endl;
+			cout << "The results of testing:" << endl;
 			cout << "Number of iteration:  Average, standard deviation: " << endl;
 			cout << AveNumItersMove << " +/- " << SDNumItersMove << endl;
 			cout << "Time cost:  Average, standard deviation: " << endl;
 			cout << AveTimeCostsMove << " +/- " << SDTimeCostsMove << endl;
 			cout << "Number of failed: " << num_of_failed_move << endl;
-			
-			cout << endl;
-			cout <<"-----------------------------------------------------------"<< endl;
-			cout << endl;
 
-			/*
-			for (int k = 0;k < NumIter.size();k++) {
-				cout << "i" << NumRange[k + 1] << ": \t" << NumIter[k] << " \t" << 100 * (double)(NumIter[k]) / num_of_iter << "%" << endl;
-			}
-
-			std::cout << endl;
-			cout << "Time cost: " << sum_time_cost / num_of_iter << endl;
-			cout << endl;
-			cout << endl;
-			*/
-
+			break;
+		}
+		else {
+			cout << "Please enter s or m: ";
 		}
 	}
 
