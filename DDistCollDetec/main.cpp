@@ -16,30 +16,11 @@ int main() {
 	double Velocity_boundary = 3;
 	int num_of_iter = 100000;	
 
-	//double time_cost;
-	//double sum_time_cost = 0;
-	//double sum_time_cost_move = 0;
-	
-	
-
 	int *NumIters = new int[num_of_iter];
 	double *TimeCosts = new double[num_of_iter];
 
 	int *NumItersMove = new int[num_of_iter];
 	double *TimeCostsMove = new double[num_of_iter];
-
-	/*
-	vector<int> NumRange;
-	NumRange.push_back(0);
-	NumRange.push_back(5);
-	NumRange.push_back(10);
-	NumRange.push_back(15);
-	NumRange.push_back(20);
-	NumRange.push_back(30);
-	NumRange.push_back(50
-	NumRange.push_back(55);*/
-
-	//vector<int> NumIter(NumRange.size() - 1, 0);
 
 	ObjElData ObjElParaData1, ObjElParaData2;
 	Obj1MSData Obj1MSParaData1, Obj1MSParaData2;
@@ -48,8 +29,7 @@ int main() {
 	Obj4CKData Obj4CKParaData1, Obj4CKParaData2;
 	Obj5PLData Obj5PLParaData1, Obj5PLParaData2;
 	Obj6HNData Obj6HNParaData1, Obj6HNParaData2;
-
-	//Select 1 objects two be tested	
+	
 	ObjectDDFuncInfo objA0 = { &ObjElParaData1, DDFuncSqGrad_Obj_EL ,DDFuncSqHess_Obj_EL ,DDFuncSqValu_Obj_EL ,DDFuncSqValuIndep_Obj_EL };
 	ObjectDDFuncInfo objA1 = { &Obj1MSParaData1, DDFuncSqGrad_Obj1_MS ,DDFuncSqHess_Obj1_MS ,DDFuncSqValu_Obj1_MS ,DDFuncSqValuIndep_Obj1_MS };
 	ObjectDDFuncInfo objA2 = { &Obj2PCParaData1, DDFuncSqGrad_Obj2_PC ,DDFuncSqHess_Obj2_PC ,DDFuncSqValu_Obj2_PC ,DDFuncSqValuIndep_Obj2_PC };	
@@ -58,7 +38,6 @@ int main() {
 	ObjectDDFuncInfo objA5 = { &Obj5PLParaData1, DDFuncSqGrad_Obj5_PL ,DDFuncSqHess_Obj5_PL ,DDFuncSqValu_Obj5_PL ,DDFuncSqValuIndep_Obj5_PL };	
 	ObjectDDFuncInfo objA6 = { &Obj6HNParaData1, DDFuncSqGrad_Obj6_HN ,DDFuncSqHess_Obj6_HN ,DDFuncSqValu_Obj6_HN ,DDFuncSqValuIndep_Obj6_HN };
 
-	//Select 2 objects two be tested
 	ObjectDDFuncInfo objB0 = { &ObjElParaData2, DDFuncSqGrad_Obj_EL ,DDFuncSqHess_Obj_EL ,DDFuncSqValu_Obj_EL ,DDFuncSqValuIndep_Obj_EL };
 	ObjectDDFuncInfo objB1 = { &Obj1MSParaData2, DDFuncSqGrad_Obj1_MS ,DDFuncSqHess_Obj1_MS ,DDFuncSqValu_Obj1_MS ,DDFuncSqValuIndep_Obj1_MS };
 	ObjectDDFuncInfo objB2 = { &Obj2PCParaData2, DDFuncSqGrad_Obj2_PC ,DDFuncSqHess_Obj2_PC ,DDFuncSqValu_Obj2_PC ,DDFuncSqValuIndep_Obj2_PC };
